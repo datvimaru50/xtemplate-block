@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { XtemplateBlocksProvider } from './xtemplate';
 import { start } from 'repl';
+import { isArray } from 'util';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -46,54 +47,27 @@ class MyFoldingRangeProvider implements vscode.FoldingRangeProvider {
 		context: vscode.FoldingContext,
 		token: vscode.CancellationToken
 	): vscode.FoldingRange[] {
-		const foldingRanges: vscode.FoldingRange[] = 
-		[
-			{
-				start: 10,
-				end: 15,
-			},
-			{
-				start: 12,
-				end: 14,
-			},
-			{
-				start: 22,
-				end: 24,
-			},
-		];
+		const foldingRanges: vscode.FoldingRange[] = [];
 		const text = document.getText();
-		// <!-- BEGIN: main -->
-		// <!-- END: main -->
+		
 		const startRegex = /<!--\s*BEGIN:\s*([\w\d_-]+)\s*-->/g;
-		const endRegex = /<!--\s*END:\s*([\w\d_-]+)\s*-->/g;
 
 		let startMatch: RegExpExecArray | null;
 		let endMatch: RegExpExecArray | null;
 
-		const stack: number[] = []; // Dùng stack để theo dõi các khối
-
-		// Tìm các cặp "###start_block" và "###end_block"
+		// Tìm các cặp BEGIN END tương ứng
 		while ((startMatch = startRegex.exec(text)) !== null) {
-			stack.push(startMatch.index);  // Thêm vị trí "start" vào stack
-		}
-		
-		console.log('thu xem sao');
-		console.log(stack);
-		
-
-		while ((endMatch = endRegex.exec(text)) !== null) {
-			const startIdx = stack.pop();  // Lấy vị trí "start" từ stack
-
-			if (startIdx !== undefined) {
-				// Tạo folding range cho mỗi cặp "start_block" và "end_block"
-				const startPosition = document.positionAt(startIdx);
-				const endPosition = document.positionAt(endMatch.index);
-				// foldingRanges.push(new vscode.FoldingRange(startPosition.line, endPosition.line));
+			const blockName = startMatch[0].split("--")[1].replace("BEGIN:", "").trim();
+			const endBlockRegex = new RegExp(String.raw`\<!--\s*END:\s*${blockName}\s*-->`, "g");
+			
+			if ((endMatch = endBlockRegex.exec(text)) !== null) {
+				foldingRanges.push({
+					start: document.positionAt(startMatch.index).line,
+					end: document.positionAt(endMatch.index).line
+				});
 			}
 		}
 		
-		
-
 		return foldingRanges;
 	}
 }
