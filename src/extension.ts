@@ -48,23 +48,42 @@ class MyFoldingRangeProvider implements vscode.FoldingRangeProvider {
 		token: vscode.CancellationToken
 	): vscode.FoldingRange[] {
 		const foldingRanges: vscode.FoldingRange[] = [];
-		const text = document.getText();
 		
-		const startRegex = /<!--\s*BEGIN:\s*([\w\d_-]+)\s*-->/g;
+		const startRegex = /<!--\s*BEGIN:\s*([\w\d_-]+)\s*-->/;
 
 		let startMatch: RegExpExecArray | null;
 		let endMatch: RegExpExecArray | null;
-
-		// Tìm các cặp BEGIN END tương ứng
-		while ((startMatch = startRegex.exec(text)) !== null) {
-			const blockName = startMatch[0].split("--")[1].replace("BEGIN:", "").trim();
-			const endBlockRegex = new RegExp(String.raw`\<!--\s*END:\s*${blockName}\s*-->`, "g");
-			
-			if ((endMatch = endBlockRegex.exec(text)) !== null) {
-				foldingRanges.push({
-					start: document.positionAt(startMatch.index).line,
-					end: document.positionAt(endMatch.index).line
-				});
+		
+		findAndPush(0, document.lineCount-1);
+		
+		function findAndPush(start: number, end: number) {
+			const text = document.getText(new vscode.Range(start, 0, end, 1000));
+			while ((startMatch = startRegex.exec(text)) !== null) {
+				const blockName = startMatch[1];
+				const endBlockRegex = new RegExp(String.raw`\<!--\s*END:\s*${blockName}\s*-->`, "g");
+				
+				if ((endMatch = endBlockRegex.exec(text)) !== null) {
+					
+					// Phải quy về tọa tuyệt đối
+					let absoluteIndex = document.offsetAt(new vscode.Position(start, 0));
+					
+					const foundStart = document.positionAt(absoluteIndex + startMatch.index).line;
+					const foundEnd = document.positionAt(absoluteIndex + endMatch.index).line;
+					
+					foldingRanges.push({
+						start: foundStart,
+						end: foundEnd
+					});
+					
+					// Tìm vào bên trong vùng vừa tìm được
+					findAndPush(foundStart+1, foundEnd-1);
+					
+					// Tìm tiếp xuống phía dưới
+					findAndPush(foundEnd+1, end);
+					
+					// Break khỏ
+					break;
+				}
 			}
 		}
 		
