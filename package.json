@@ -19,21 +19,6 @@
 				"command": "xtemplate-block.helloDat",
 				"title": "Hello Dat"
 			}
-		],
-		"views": {
-			"explorer": [
-				{
-					"id": "xtemplatetree",
-					"name": "XTemplate Tree"
-				}
-			]
-		},
-		"languages": [
-			{
-				"id": "html",
-				"extensions": [".tpl"],
-				"aliases": ["XTemplate", "xtemplate"]
-			}
 		]
 	},
 	"scripts": {
