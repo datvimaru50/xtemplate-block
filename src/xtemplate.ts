@@ -63,6 +63,14 @@ export class XTemplateHoverProvider implements vscode.HoverProvider {
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
+        const lineText = document.lineAt(position.line).text;
+
+        // Check if the line contains BEGIN or END tags
+        const isBeginOrEnd = /<!--\s*(BEGIN|END):\s*\w+\s*-->/.test(lineText);
+        if (!isBeginOrEnd) {
+            return null;
+        }
+
         const symbols = await this.symbolProvider.provideDocumentSymbols(document, token);
 
         if (symbols) {
