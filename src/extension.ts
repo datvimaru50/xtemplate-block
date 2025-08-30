@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { XTemplateDocumentSymbolProvider } from './xtemplate';
+import { XTemplateDocumentSymbolProvider, XTemplateHoverProvider } from './xtemplate';
 import { start } from 'repl';
 import { isArray } from 'util';
 
@@ -19,6 +19,12 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.languages.registerDocumentSymbolProvider(
 		{ language: 'html' },
 		new XTemplateDocumentSymbolProvider()
+	);
+
+	// Register the DocumentHoverProvider for HTML language
+	vscode.languages.registerHoverProvider(
+		{ language: 'html' },
+		new XTemplateHoverProvider( new XTemplateDocumentSymbolProvider() )
 	);
 
 	// The command has been defined in the package.json file

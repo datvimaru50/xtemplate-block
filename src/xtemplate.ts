@@ -54,3 +54,50 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
         return symbols;
     }
 }
+
+export class XTemplateHoverProvider implements vscode.HoverProvider {
+    constructor(private symbolProvider: XTemplateDocumentSymbolProvider) {}
+
+    async provideHover(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken
+    ): Promise<vscode.Hover | null> {
+        const symbols = await this.symbolProvider.provideDocumentSymbols(document, token);
+
+        if (symbols) {
+            for (const symbol of symbols) {
+                const hoverResult = this.getHoverForSymbol(symbol, position);
+                if (hoverResult) {
+                    return hoverResult;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private getHoverForSymbol(symbol: vscode.DocumentSymbol, position: vscode.Position): vscode.Hover | null {
+        if (this.isPositionInRange(position, symbol.range)) {
+            return new vscode.Hover(`Path: ${symbol.detail}`);
+        }
+
+        for (const child of symbol.children) {
+            const hoverResult = this.getHoverForSymbol(child, position);
+            if (hoverResult) {
+                return hoverResult;
+            }
+        }
+
+        return null;
+    }
+
+    private isPositionInRange(position: vscode.Position, range: vscode.Range): boolean {
+        return (
+            position.line >= range.start.line &&
+            position.line <= range.end.line &&
+            position.character >= range.start.character &&
+            position.character <= range.end.character
+        );
+    }
+}
