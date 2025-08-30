@@ -16,12 +16,33 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.languages.registerFoldingRangeProvider({ language: 'html' }, new MyFoldingRangeProvider());
 
 
-	// TODO: Tìm xem cách lấy nội dung file tpl đang mở thì làm thế nào
-	const fileContent = "";
+	// Create the XTemplate blocks provider
+	let xtemplateBlocksProvider: XtemplateBlocksProvider;
 
-	// Samples of `window.registerTreeDataProvider`
-	const xtemplateBlocksProvider = new XtemplateBlocksProvider(fileContent);
+	// Initialize with current active editor if it exists
+	if (vscode.window.activeTextEditor) {
+		xtemplateBlocksProvider = new XtemplateBlocksProvider(vscode.window.activeTextEditor.document.getText());
+	} else {
+		xtemplateBlocksProvider = new XtemplateBlocksProvider('');
+	}
+
+	// Register the tree data provider
 	vscode.window.registerTreeDataProvider('xtemplatetree', xtemplateBlocksProvider);
+
+	// Update tree when active editor changes
+	vscode.window.onDidChangeActiveTextEditor(editor => {
+		if (editor && editor.document.languageId === 'html') {
+			xtemplateBlocksProvider.updateContent(editor.document.getText());
+		}
+	});
+
+	// Update tree when document changes
+	vscode.workspace.onDidChangeTextDocument(event => {
+		if (event.document === vscode.window.activeTextEditor?.document &&
+			event.document.languageId === 'html') {
+			xtemplateBlocksProvider.updateContent(event.document.getText());
+		}
+	});
 
 
 	// Đăng ký một luật fold mới cho ngôn gữ HTML
