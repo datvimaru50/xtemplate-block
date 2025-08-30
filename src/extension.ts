@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { XtemplateBlocksProvider } from './xtemplate';
+import { XtemplateBlocksProvider, XTemplateDocumentSymbolProvider } from './xtemplate';
 import { start } from 'repl';
 import { isArray } from 'util';
 
@@ -43,6 +43,12 @@ export function activate(context: vscode.ExtensionContext) {
 			xtemplateBlocksProvider.updateContent(event.document.getText());
 		}
 	});
+
+	// Register the DocumentSymbolProvider for HTML language
+	vscode.languages.registerDocumentSymbolProvider(
+		{ language: 'html' },
+		new XTemplateDocumentSymbolProvider()
+	);
 
 
 	// Đăng ký một luật fold mới cho ngôn gữ HTML
