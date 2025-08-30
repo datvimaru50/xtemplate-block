@@ -50,10 +50,10 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
                     );
                     symbol.selectionRange = symbol.range;
 
-                    // Add folding range
+                    // Add folding range, excluding the END line from being hidden
                     this.foldingRanges.push({
                         start: startLine,
-                        end: line,
+                        end: line - 1, // Exclude the END line
                     });
                 }
             }
