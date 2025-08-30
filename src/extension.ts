@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { XTemplateDocumentSymbolProvider, XTemplateHoverProvider } from './xtemplate';
+import { XTemplateDocumentSymbolProvider, XTemplateHoverProvider, XtemplateFoldingRangeProvider } from './xtemplate';
 import { start } from 'repl';
 import { isArray } from 'util';
 
@@ -13,18 +13,25 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "xtemplate-block" is now active!');
 	
-	vscode.languages.registerFoldingRangeProvider({ language: 'html' }, new MyFoldingRangeProvider());
-
-	// Register the DocumentSymbolProvider for HTML language
+	// Khởi tạo để dùng cho cả 3 chỗ
+	const Symbols = new XTemplateDocumentSymbolProvider();
+	
+	// Tạo cấu trúc tree of Symbol
 	vscode.languages.registerDocumentSymbolProvider(
 		{ language: 'html' },
-		new XTemplateDocumentSymbolProvider()
+		Symbols
+	);
+	
+	// Shrink/Expand
+	vscode.languages.registerFoldingRangeProvider(
+		{ language: 'html' }, 
+		new XtemplateFoldingRangeProvider( Symbols )
 	);
 
-	// Register the DocumentHoverProvider for HTML language
+	// Hover hiện ra đường dẫn
 	vscode.languages.registerHoverProvider(
 		{ language: 'html' },
-		new XTemplateHoverProvider( new XTemplateDocumentSymbolProvider() )
+		new XTemplateHoverProvider( Symbols )
 	);
 
 	// The command has been defined in the package.json file
@@ -37,56 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
-}
-
-class MyFoldingRangeProvider implements vscode.FoldingRangeProvider {
-	provideFoldingRanges(
-		document: vscode.TextDocument,
-		context: vscode.FoldingContext,
-		token: vscode.CancellationToken
-	): vscode.FoldingRange[] {
-		const foldingRanges: vscode.FoldingRange[] = [];
-		
-		const startRegex = /<!--\s*BEGIN:\s*([\w\d_-]+)\s*-->/;
-
-		let startMatch: RegExpExecArray | null;
-		let endMatch: RegExpExecArray | null;
-		
-		findAndPush(0, document.lineCount-1);
-		
-		function findAndPush(start: number, end: number) {
-			const text = document.getText(new vscode.Range(start, 0, end, 1000));
-			while ((startMatch = startRegex.exec(text)) !== null) {
-				const blockName = startMatch[1];
-				const endBlockRegex = new RegExp(String.raw`\<!--\s*END:\s*${blockName}\s*-->`, "g");
-				
-				if ((endMatch = endBlockRegex.exec(text)) !== null) {
-					
-					// Phải quy về tọa tuyệt đối
-					let absoluteIndex = document.offsetAt(new vscode.Position(start, 0));
-					
-					const foundStart = document.positionAt(absoluteIndex + startMatch.index).line;
-					const foundEnd = document.positionAt(absoluteIndex + endMatch.index).line;
-					
-					foldingRanges.push({
-						start: foundStart,
-						end: foundEnd
-					});
-					
-					// Tìm vào bên trong vùng vừa tìm được
-					findAndPush(foundStart+1, foundEnd-1);
-					
-					// Tìm tiếp xuống phía dưới
-					findAndPush(foundEnd+1, end);
-					
-					// Break khỏ
-					break;
-				}
-			}
-		}
-		
-		return foldingRanges;
-	}
 }
 
 // This method is called when your extension is DEACTIVATED

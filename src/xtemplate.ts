@@ -2,12 +2,14 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+    private foldingRanges: vscode.FoldingRange[] = [];
+
     public provideDocumentSymbols(
         document: vscode.TextDocument,
         token: vscode.CancellationToken
     ): vscode.ProviderResult<vscode.DocumentSymbol[]> {
         const symbols: vscode.DocumentSymbol[] = [];
-        const stack: { symbol: vscode.DocumentSymbol; path: string[] }[] = [];
+        const stack: { symbol: vscode.DocumentSymbol; path: string[]; startLine: number }[] = [];
 
         for (let line = 0; line < document.lineCount; line++) {
             const text = document.lineAt(line).text;
@@ -19,7 +21,7 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
                 const symbol = new vscode.DocumentSymbol(
                     name,
                     '',
-                    vscode.SymbolKind.Namespace,
+                    vscode.SymbolKind.Class, // Use 'Class' for a more distinct icon
                     new vscode.Range(line, 0, line, text.length),
                     new vscode.Range(line, 0, line, text.length)
                 );
@@ -33,7 +35,7 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
                     symbols.push(symbol);
                 }
 
-                stack.push({ symbol, path: currentPath });
+                stack.push({ symbol, path: currentPath, startLine: line });
             }
 
             // Check for END block
@@ -41,17 +43,27 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
             if (endMatch) {
                 const name = endMatch[1];
                 if (stack.length > 0 && stack[stack.length - 1].symbol.name === name) {
-                    const { symbol } = stack.pop()!;
+                    const { symbol, startLine } = stack.pop()!;
                     symbol.range = new vscode.Range(
                         symbol.range.start,
                         new vscode.Position(line, text.length)
                     );
                     symbol.selectionRange = symbol.range;
+
+                    // Add folding range
+                    this.foldingRanges.push({
+                        start: startLine,
+                        end: line,
+                    });
                 }
             }
         }
 
         return symbols;
+    }
+
+    public provideFoldingRanges(): vscode.FoldingRange[] {
+        return this.foldingRanges;
     }
 }
 
@@ -108,4 +120,17 @@ export class XTemplateHoverProvider implements vscode.HoverProvider {
             position.character <= range.end.character
         );
     }
+}
+
+
+export class XtemplateFoldingRangeProvider implements vscode.FoldingRangeProvider {
+    constructor(private symbolProvider: XTemplateDocumentSymbolProvider) {}
+    
+	provideFoldingRanges(
+		document: vscode.TextDocument,
+		context: vscode.FoldingContext,
+		token: vscode.CancellationToken
+	): vscode.FoldingRange[] {
+		return this.symbolProvider.provideFoldingRanges();
+	}
 }
