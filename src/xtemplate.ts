@@ -14,8 +14,8 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
         for (let line = 0; line < document.lineCount; line++) {
             const text = document.lineAt(line).text;
 
-            // Check for BEGIN block
-            const beginMatch = text.match(/<!--\s*BEGIN:\s*(\w+)\s*-->/);
+            // Check for BEGIN block (case-insensitive)
+            const beginMatch = text.match(/<!--\s*BEGIN:\s*([\w\d_-]+)\s*-->/i);
             if (beginMatch) {
                 const name = beginMatch[1];
                 const symbol = new vscode.DocumentSymbol(
@@ -38,11 +38,11 @@ export class XTemplateDocumentSymbolProvider implements vscode.DocumentSymbolPro
                 stack.push({ symbol, path: currentPath, startLine: line });
             }
 
-            // Check for END block
-            const endMatch = text.match(/<!--\s*END:\s*(\w+)\s*-->/);
+            // Check for END block (case-insensitive)
+            const endMatch = text.match(/<!--\s*END:\s*([\w\d_-]+)\s*-->/i);
             if (endMatch) {
                 const name = endMatch[1];
-                if (stack.length > 0 && stack[stack.length - 1].symbol.name === name) {
+                if (stack.length > 0 && stack[stack.length - 1].symbol.name.toLowerCase() === name.toLowerCase()) {
                     const { symbol, startLine } = stack.pop()!;
                     symbol.range = new vscode.Range(
                         symbol.range.start,
