@@ -13,6 +13,7 @@
 	],
 	"main": "./dist/extension.js",
 	"icon": "./media/icon.png",
+	"activationEvents": ["onLanguage:html"],
 	"scripts": {
 		"vscode:prepublish": "npm run package",
 		"compile": "webpack",
