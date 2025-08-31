@@ -1,26 +1,18 @@
 {
 	"name": "xtemplate-block",
 	"displayName": "Xtemplate Block",
-	"description": "Parsing the outline of xtemplate in HTML file",
+	"description": "Enhances Xtemplate markup files with features like parsing <!-- BEGIN: name --> & <!-- END: name --> into language symbols, adding folding ranges, and providing hover-to-get-path functionality for an improved development experience.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.98.0"
 	},
 	"categories": [
+		"Programming Languages",
+		"Linters",
 		"Other"
 	],
-	"activationEvents": [
-		"onLanguage:html"
-	],
 	"main": "./dist/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "xtemplate-block.helloDat",
-				"title": "Hello Dat"
-			}
-		]
-	},
+	"icon": "./media/icon.png",
 	"scripts": {
 		"vscode:prepublish": "npm run package",
 		"compile": "webpack",
