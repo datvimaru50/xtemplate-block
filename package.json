@@ -2,7 +2,7 @@
 	"name": "xtemplate-block",
 	"displayName": "Xtemplate Block",
 	"description": "Enhances Xtemplate markup files with features like parsing <!-- BEGIN: name --> & <!-- END: name --> into language symbols, adding folding ranges, and providing hover-to-get-path functionality for an improved development experience.",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.98.0"
 	},

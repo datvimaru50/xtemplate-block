@@ -3,6 +3,7 @@
 The `xtemplate-block` extension is designed to enhance your Visual Studio Code experience by providing powerful tools for working with XTemplate files. This extension streamlines your workflow and boosts productivity when dealing with XTemplate-based projects.
 
 ## Features
+![What this extension can do](./media/main-features-new.gif)
 
 - **Provide Language Symbols**: Provide language symbols based on parsed blocknames of BEGIN-END.
 - **Shrink/Expand**: Shrink/Expand your xtemplate markup block.
