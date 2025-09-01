@@ -99,7 +99,7 @@ export class XTemplateHoverProvider implements vscode.HoverProvider {
 
     private getHoverForSymbol(symbol: vscode.DocumentSymbol, position: vscode.Position): vscode.Hover | null {
         if (this.isPositionInRange(position, symbol.range)) {
-            return new vscode.Hover(`Path: ${symbol.detail}`);
+            return new vscode.Hover(`${symbol.detail}`);
         }
 
         for (const child of symbol.children) {
@@ -114,10 +114,7 @@ export class XTemplateHoverProvider implements vscode.HoverProvider {
 
     private isPositionInRange(position: vscode.Position, range: vscode.Range): boolean {
         return (
-            position.line >= range.start.line &&
-            position.line <= range.end.line &&
-            position.character >= range.start.character &&
-            position.character <= range.end.character
+            position.line === range.start.line || position.line === range.end.line
         );
     }
 }
