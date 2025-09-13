@@ -20,6 +20,9 @@ For the projects that use different file extensions as HTML, for example `.tpl`,
 ```
 
 ## Release Notes
+### 1.0.1
+
+- Add `copy` button to quickly copy the path of each block.
 
 ### 1.0.0
 
