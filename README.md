@@ -11,19 +11,13 @@ The `xtemplate-block` extension is designed to enhance your Visual Studio Code e
 
 ## Requirements
 
-This extension requires Visual Studio Code version 1.70.0 or higher.
+For the projects that use different file extensions as HTML, for example `.tpl`, please add this setting to VSCode:
 
-## Extension Settings
-
-This extension contributes the following settings:
-
-- `xtemplate-block.enable`: Enable or disable the extension.
-- `xtemplate-block.validateOnSave`: Enable validation of XTemplate files on save.
-
-## Known Issues
-
-- Large XTemplate files may take longer to validate.
-- Hover ability sometimes shows incorrect paths.
+```json
+"files.associations": {
+    "*.tpl": "html",
+}
+```
 
 ## Release Notes
 
