@@ -33,6 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
 		{ language: 'html' },
 		new XTemplateHoverProvider( Symbols )
 	);
+
+	// Register the copyToClipboard command
+	vscode.commands.registerCommand('xtemplate.copyToClipboard', (text: string) => {
+		vscode.env.clipboard.writeText(text);
+		vscode.window.showInformationMessage('Copied to clipboard!');
+	});
 }
 
 // This method is called when your extension is DEACTIVATED

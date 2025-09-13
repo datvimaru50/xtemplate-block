@@ -99,7 +99,13 @@ export class XTemplateHoverProvider implements vscode.HoverProvider {
 
     private getHoverForSymbol(symbol: vscode.DocumentSymbol, position: vscode.Position): vscode.Hover | null {
         if (this.isPositionInRange(position, symbol.range)) {
-            return new vscode.Hover(`${symbol.detail}`);
+            const markdown = new vscode.MarkdownString();
+            markdown.appendMarkdown(`\`${symbol.detail}\``);
+            markdown.appendMarkdown('\n\n---\n');
+            markdown.appendMarkdown(`[Copy](command:xtemplate.copyToClipboard?${encodeURIComponent(JSON.stringify([symbol.detail]))} "Copy to Clipboard")`);
+            markdown.isTrusted = true; // Allow command links
+
+            return new vscode.Hover(markdown);
         }
 
         for (const child of symbol.children) {
