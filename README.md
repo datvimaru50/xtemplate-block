@@ -8,6 +8,7 @@ The `xtemplate-block` extension is designed to enhance your Visual Studio Code e
 - **Provide Language Symbols**: Provide language symbols based on parsed blocknames of BEGIN-END.
 - **Shrink/Expand**: Shrink/Expand your xtemplate markup block.
 - **Hover for path**: Hover on the BEGIN/END tag, a path from the root tag will be shown up.
+- **Linked Editing** ⭐ NEW: Automatically sync block name changes between BEGIN and END tags. When you rename a block in `<!-- BEGIN: blockname -->`, the corresponding `<!-- END: blockname -->` is updated in real-time, and vice versa. Supports nested blocks and case-insensitive matching.
 
 ## Requirements
 
@@ -20,6 +21,14 @@ For the projects that use different file extensions as HTML, for example `.tpl`,
 ```
 
 ## Release Notes
+
+### 1.1.0
+
+- **NEW**: Linked Editing feature - automatically sync block name changes between BEGIN and END tags
+- Supports nested blocks with accurate matching
+- Case-insensitive matching
+- Real-time visual feedback
+
 ### 1.0.1
 
 - Add `copy` button to quickly copy the path of each block.
