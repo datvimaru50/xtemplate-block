@@ -10,6 +10,11 @@ The `xtemplate-block` extension is designed to enhance your Visual Studio Code e
 - **Hover for path**: Hover on the BEGIN/END tag, a path from the root tag will be shown up.
 
 ## Requirements
+For `Linked Editing feature` to work, you have to enable this setting in VSCode:
+
+```json
+"editor.linkedEditing": true
+```
 
 For the projects that use different file extensions as HTML, for example `.tpl`, please add this setting to VSCode:
 
@@ -20,6 +25,13 @@ For the projects that use different file extensions as HTML, for example `.tpl`,
 ```
 
 ## Release Notes
+### 1.1.0
+
+- **NEW**: Linked Editing feature - automatically sync block name changes between BEGIN and END tags
+- Supports nested blocks with accurate matching
+- Case-insensitive matching
+- Real-time visual feedback
+
 ### 1.0.1
 
 - Add `copy` button to quickly copy the path of each block.
