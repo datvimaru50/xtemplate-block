@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { XTemplateDocumentSymbolProvider, XTemplateHoverProvider, XtemplateFoldingRangeProvider } from './xtemplate';
+import { XTemplateLinkedEditingProvider } from './linkedEditingProvider';
 import { start } from 'repl';
 import { isArray } from 'util';
 
@@ -32,6 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.languages.registerHoverProvider(
 		{ language: 'html' },
 		new XTemplateHoverProvider( Symbols )
+	);
+
+	// Linked editing for BEGIN-END block pairs
+	vscode.languages.registerLinkedEditingRangeProvider(
+		{ language: 'html' },
+		new XTemplateLinkedEditingProvider()
 	);
 
 	// Register the copyToClipboard command
